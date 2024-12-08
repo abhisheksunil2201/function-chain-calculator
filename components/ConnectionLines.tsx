@@ -1,5 +1,5 @@
 "use client";
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useCallback } from "react";
 
 const connections = [
   { from: "input-0", to: "input-1" },
@@ -20,9 +20,8 @@ const getCurvedLinePoints = (
   const dy = y2 - y1;
   const distance = Math.sqrt(dx * dx + dy * dy);
   const isSamePlane = Math.abs(y2 - y1) < 50;
-  console.log(distance);
 
-  if (distance < 100) {
+  if (distance < 150) {
     return [x1, y1, x1, y1, x2, y2, x2, y2];
   }
 
@@ -61,8 +60,24 @@ const getCurvedLinePoints = (
 
 const ConnectionLines: React.FC = () => {
   const svgRef = useRef<SVGSVGElement>(null);
+  //   const [dimensions, setDimensions] = useState({
+  //     width: window.innerWidth,
+  //     height: window.innerHeight,
+  //   });
 
-  useEffect(() => {
+  const createCircle = (x: number, y: number) => {
+    const circle = document.createElementNS(
+      "http://www.w3.org/2000/svg",
+      "circle"
+    );
+    circle.setAttribute("cx", (x + 2).toString());
+    circle.setAttribute("cy", (y + 2).toString());
+    circle.setAttribute("r", "5");
+    circle.setAttribute("fill", "rgba(0, 0, 255)");
+    return circle;
+  };
+
+  const renderlines = useCallback(() => {
     if (svgRef.current) {
       const svg = svgRef.current;
       svg.innerHTML = ""; // Clear previous lines
@@ -93,23 +108,32 @@ const ConnectionLines: React.FC = () => {
           );
           line.setAttribute(
             "d",
-            `M${x1},${y1} C${cp1X},${cp1Y} ${cp2X},${cp2Y} ${x2},${y2}`
+            `M${x1 + 2},${y1 + 2} C${cp1X},${cp1Y} ${cp2X},${cp2Y} ${x2 + 2},${
+              y2 + 2
+            }`
           );
           line.setAttribute("fill", "none");
           line.setAttribute("stroke", "rgba(135, 206, 250, 0.5)"); // Sky Blue with 50% opacity
           line.setAttribute("stroke-width", "8"); // Thicker line
           line.setAttribute("stroke-linecap", "round"); // Rounded line ends
+          //circles at the beginning and end of the line
+          svg.appendChild(createCircle(x1, y1));
+          svg.appendChild(createCircle(x2, y2));
+
           svg.appendChild(line);
         }
       });
     }
   }, []);
 
+  useEffect(() => {
+    renderlines();
+  }, [renderlines]);
+
   return (
     <svg
       ref={svgRef}
-      className="absolute inset-0 pointer-events-none"
-      viewBox={`0 0 ${window.innerWidth} ${window.innerHeight}`}
+      className="absolute inset-0 pointer-events-none w-screen h-screen overflow-visible"
     />
   );
 };

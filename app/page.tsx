@@ -14,9 +14,9 @@ export default function Home() {
     functionChain,
   } = useFunctionChain();
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-4 font-[family-name:var(--font-geist-sans)]">
-      <div className="w-full h-full">
-        <div className="flex relative justify-center items-center mb-8 h-full w-full">
+    <div className="min-h-screen flex flex-col items-center justify-center font-[family-name:var(--font-geist-sans)]">
+      <div className="w-screen h-screen">
+        <div className="flex relative justify-center items-center h-full w-full">
           {functionChain.map((func) => {
             if (func.label === "Input") {
               return (
@@ -35,7 +35,7 @@ export default function Home() {
                     <input
                       type="number"
                       value={initialInput}
-                      onChange={(e) => setInitialInput(e.target.value)}
+                      onChange={(e) => setInitialInput(Number(e.target.value))}
                       className="px-4 py-2 text-center w-full rounded-2xl flex-[0.8] focus:outline-none font-extrabold"
                     />
                     <div className="w-[0.1px] h-14 bg-[#E29A2D]" />

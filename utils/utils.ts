@@ -5,10 +5,20 @@ export const isValidExpression = (expr: string): boolean => {
 
 export const evaluateExpression = (expression: string, x: number): number => {
   try {
-    // Replace '^' with '**'
-    const fn = new Function("x", `return ${expression.replace(/\^/g, "**")}`);
-    return fn(x);
-  } catch {
+    const sanitizedExpression = expression
+      .replace(/\^/g, "**")
+      .replace(/\s/g, "")
+      .replace(/(\d+)x/g, "$1 * x")
+      .replace(/x/g, `(${x})`);
+    const fn = new Function("return " + sanitizedExpression);
+    const result = fn();
+    if (typeof result !== "number" || isNaN(result)) {
+      throw new Error("Invalid calculation");
+    }
+
+    return result;
+  } catch (error) {
+    console.error("Expression evaluation error:", error);
     return NaN;
   }
 };
